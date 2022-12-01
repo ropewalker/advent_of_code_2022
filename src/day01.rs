@@ -24,21 +24,19 @@ fn part1(calories: &[Vec<u32>]) -> u32 {
 
 #[aoc(day1, part2)]
 fn part2(calories: &[Vec<u32>]) -> u32 {
-    let total_calories: Vec<u32> = calories
+    calories
         .iter()
         .map(|inventory| inventory.iter().sum())
-        .collect();
+        .fold(vec![0, 0, 0], |mut top_three, calories| {
+            if calories > top_three[0] {
+                top_three[0] = calories;
+                top_three.sort_unstable();
+            }
 
-    let mut top_three = vec![0, 0, 0];
-
-    for calories in total_calories {
-        if calories > top_three[0] {
-            top_three[0] = calories;
-            top_three.sort_unstable();
-        }
-    }
-
-    top_three.iter().sum()
+            top_three
+        })
+        .iter()
+        .sum()
 }
 
 #[cfg(test)]
