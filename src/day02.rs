@@ -121,22 +121,16 @@ fn round_outcome(opponent_shape: &Shape, your_shape: &Shape) -> RoundOutcome {
     use RoundOutcome::*;
     use Shape::*;
 
-    match your_shape {
-        Rock => match opponent_shape {
-            Rock => Draw,
-            Paper => Loss,
-            Scissors => Win,
-        },
-        Paper => match opponent_shape {
-            Rock => Win,
-            Paper => Draw,
-            Scissors => Loss,
-        },
-        Scissors => match opponent_shape {
-            Rock => Loss,
-            Paper => Win,
-            Scissors => Draw,
-        },
+    match (your_shape, opponent_shape) {
+        (Rock, Rock) => Draw,
+        (Rock, Paper) => Loss,
+        (Rock, Scissors) => Win,
+        (Paper, Rock) => Win,
+        (Paper, Paper) => Draw,
+        (Paper, Scissors) => Loss,
+        (Scissors, Rock) => Loss,
+        (Scissors, Paper) => Win,
+        (Scissors, Scissors) => Draw,
     }
 }
 
@@ -144,22 +138,16 @@ fn your_shape(opponent_shape: &Shape, round_outcome: &RoundOutcome) -> Shape {
     use RoundOutcome::*;
     use Shape::*;
 
-    match opponent_shape {
-        Rock => match round_outcome {
-            Loss => Scissors,
-            Draw => Rock,
-            Win => Paper,
-        },
-        Paper => match round_outcome {
-            Loss => Rock,
-            Draw => Paper,
-            Win => Scissors,
-        },
-        Scissors => match round_outcome {
-            Loss => Paper,
-            Draw => Scissors,
-            Win => Rock,
-        },
+    match (opponent_shape, round_outcome) {
+        (Rock, Loss) => Scissors,
+        (Rock, Draw) => Rock,
+        (Rock, Win) => Paper,
+        (Paper, Loss) => Rock,
+        (Paper, Draw) => Paper,
+        (Paper, Win) => Scissors,
+        (Scissors, Loss) => Paper,
+        (Scissors, Draw) => Scissors,
+        (Scissors, Win) => Rock,
     }
 }
 
