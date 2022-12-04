@@ -4,11 +4,14 @@ use std::collections::HashSet;
 type ItemType = char;
 struct Rucksack(Vec<ItemType>);
 
+const LOWERCASE_A_PRIORITY: u32 = 1;
+const UPPERCASE_A_PRIORITY: u32 = 27;
+
 fn priority(item_type: &ItemType) -> u32 {
     if item_type.is_ascii_lowercase() {
-        *item_type as u32 - 'a' as u32 + 1
+        LOWERCASE_A_PRIORITY + *item_type as u32 - 'a' as u32
     } else {
-        *item_type as u32 - 'A' as u32 + 27
+        UPPERCASE_A_PRIORITY + *item_type as u32 - 'A' as u32
     }
 }
 
