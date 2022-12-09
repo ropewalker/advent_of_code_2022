@@ -2,7 +2,9 @@ use crate::day09::Direction::*;
 use aoc_runner_derive::{aoc, aoc_generator};
 use std::collections::HashSet;
 
-#[derive(Debug)]
+const SHORT_ROPE_KNOTS_COUNT: usize = 2;
+const LONG_ROPE_KNOTS_COUNT: usize = 10;
+
 enum Direction {
     Left,
     Right,
@@ -41,7 +43,7 @@ impl Rope {
         }
     }
 
-    fn make_step(&mut self, direction: &Direction) {
+    fn move_once(&mut self, direction: &Direction) {
         let mut head = self.knots.first_mut().unwrap();
 
         match direction {
@@ -76,10 +78,9 @@ fn parse_input(input: &str) -> Vec<Motion> {
         .collect()
 }
 
-#[aoc(day9, part1)]
-fn part1(series_of_motions: &[Motion]) -> usize {
+fn visited_by_tail(series_of_motions: &[Motion], knots_count: usize) -> usize {
     let mut rope = Rope {
-        knots: vec![(0, 0); 2],
+        knots: vec![(0, 0); knots_count],
     };
 
     let mut tail_visited = HashSet::with_capacity(series_of_motions.len());
@@ -87,7 +88,7 @@ fn part1(series_of_motions: &[Motion]) -> usize {
 
     for motion in series_of_motions {
         for _ in 0..motion.steps {
-            rope.make_step(&motion.direction);
+            rope.move_once(&motion.direction);
             tail_visited.insert(rope.tail());
         }
     }
@@ -95,23 +96,14 @@ fn part1(series_of_motions: &[Motion]) -> usize {
     tail_visited.len()
 }
 
+#[aoc(day9, part1)]
+fn part1(series_of_motions: &[Motion]) -> usize {
+    visited_by_tail(series_of_motions, SHORT_ROPE_KNOTS_COUNT)
+}
+
 #[aoc(day9, part2)]
 fn part2(series_of_motions: &[Motion]) -> usize {
-    let mut rope = Rope {
-        knots: vec![(0, 0); 10],
-    };
-
-    let mut tail_visited = HashSet::with_capacity(series_of_motions.len());
-    tail_visited.insert((0, 0));
-
-    for motion in series_of_motions {
-        for _ in 0..motion.steps {
-            rope.make_step(&motion.direction);
-            tail_visited.insert(rope.tail());
-        }
-    }
-
-    tail_visited.len()
+    visited_by_tail(series_of_motions, LONG_ROPE_KNOTS_COUNT)
 }
 
 #[cfg(test)]
