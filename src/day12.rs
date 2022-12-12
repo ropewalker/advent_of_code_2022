@@ -1,5 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque};
 
 type Coordinates = (i32, i32);
 
@@ -7,9 +7,11 @@ const LOWEST_ELEVATION: u32 = 'a' as u32;
 const HIGHEST_ELEVATION: u32 = 'z' as u32;
 
 struct Map {
-    elevations: HashMap<Coordinates, u32>,
+    elevations: Vec<Vec<u32>>,
     current_position: Coordinates,
     best_signal_location: Coordinates,
+    width: usize,
+    height: usize,
 }
 
 impl Map {
@@ -17,10 +19,10 @@ impl Map {
         [(-1, 0), (1, 0), (0, -1), (0, 1)]
             .into_iter()
             .map(|(x, y)| (current_position.0 + x, current_position.1 + y))
-            .filter_map(|coordinates| self.elevations.get_key_value(&coordinates))
-            .map(|(neighbor_position, neighbor_elevation)| {
-                (*neighbor_position, *neighbor_elevation)
+            .filter(|(x, y)| {
+                *x >= 0 && (*x as usize) < self.width && *y >= 0 && (*y as usize) < self.height
             })
+            .map(|(x, y)| ((x, y), self.elevations[y as usize][x as usize]))
             .collect()
     }
 }
@@ -29,28 +31,37 @@ impl Map {
 fn parse_input(input: &str) -> Map {
     let mut current_position = (0, 0);
     let mut best_signal_location = (0, 0);
-    let mut elevations = HashMap::new();
+    let mut elevations = Vec::new();
 
     for (y, row) in input.lines().enumerate() {
+        let mut row_elevations = Vec::with_capacity(row.len());
+
         for (x, elevation) in row.chars().enumerate() {
             match elevation {
                 'S' => {
                     current_position = (x as i32, y as i32);
-                    elevations.insert((x as i32, y as i32), LOWEST_ELEVATION)
+                    row_elevations.push(LOWEST_ELEVATION)
                 }
                 'E' => {
                     best_signal_location = (x as i32, y as i32);
-                    elevations.insert((x as i32, y as i32), HIGHEST_ELEVATION)
+                    row_elevations.push(HIGHEST_ELEVATION)
                 }
-                elevation => elevations.insert((x as i32, y as i32), elevation as u32),
+                elevation => row_elevations.push(elevation as u32),
             };
         }
+
+        elevations.push(row_elevations);
     }
+
+    let width = elevations[0].len();
+    let height = elevations.len();
 
     Map {
         elevations,
         current_position,
         best_signal_location,
+        width,
+        height,
     }
 }
 
