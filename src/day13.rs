@@ -45,7 +45,7 @@ fn parse_input(input: &str) -> Vec<(Packet, Packet)> {
     input
         .split("\n\n")
         .map(|packet_pair| {
-            let mut packets = packet_pair.lines().map(|packet| parse_packet(packet));
+            let mut packets = packet_pair.lines().map(parse_packet);
             (packets.next().unwrap(), packets.next().unwrap())
         })
         .collect()
@@ -56,31 +56,29 @@ fn is_right_order(left: &Packet, right: &Packet) -> bool {
     let mut right = right.to_owned();
 
     while !left.is_empty() && !right.is_empty() {
-        match left.pop_front().unwrap() {
-            LeftBracket => match right.pop_front().unwrap() {
-                LeftBracket => (),
-                RightBracket => return false,
-                Integer(right_integer) => {
-                    right.push_front(RightBracket);
-                    right.push_front(Integer(right_integer));
-                }
-            },
-            RightBracket => match right.pop_front().unwrap() {
-                LeftBracket | Integer(_) => return true,
-                RightBracket => (),
-            },
-            Integer(left_integer) => match right.pop_front().unwrap() {
-                LeftBracket => {
-                    left.push_front(RightBracket);
-                    left.push_front(Integer(left_integer));
-                }
-                RightBracket => return false,
-                Integer(right_integer) => match left_integer.cmp(&right_integer) {
+        let left_symbol = left.pop_front().unwrap();
+        let right_symbol = right.pop_front().unwrap();
+
+        match (left_symbol, right_symbol) {
+            (left_symbol, right_symbol) if left_symbol == right_symbol => (),
+            (_, RightBracket) => return false,
+            (RightBracket, _) => return true,
+            (Integer(left_integer), Integer(right_integer)) => {
+                match left_integer.cmp(&right_integer) {
                     Less => return true,
                     Greater => return false,
-                    Equal => (),
-                },
-            },
+                    _ => (),
+                }
+            }
+            (LeftBracket, Integer(integer)) => {
+                right.push_front(RightBracket);
+                right.push_front(Integer(integer));
+            }
+            (Integer(integer), LeftBracket) => {
+                left.push_front(RightBracket);
+                left.push_front(Integer(integer));
+            }
+            _ => unreachable!(),
         }
     }
 
@@ -116,7 +114,7 @@ fn part2(packet_pairs: &[(Packet, Packet)]) -> usize {
             .iter()
             .filter(|packet| is_right_order(packet, &divider_packet_2))
             .count()
-            + 2)
+            + 2) //including [[2]] as its order is less than the order of [[6]]
 }
 
 #[cfg(test)]
