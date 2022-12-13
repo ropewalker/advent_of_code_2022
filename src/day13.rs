@@ -105,16 +105,25 @@ fn part2(packet_pairs: &[(Packet, Packet)]) -> usize {
     let divider_packet_1 = parse_packet(DIVIDER_PACKET_1);
     let divider_packet_2 = parse_packet(DIVIDER_PACKET_2);
 
-    (packets
-        .iter()
-        .filter(|packet| is_right_order(packet, &divider_packet_1))
-        .count()
-        + 1)
-        * (packets
-            .iter()
-            .filter(|packet| is_right_order(packet, &divider_packet_2))
-            .count()
-            + 2) //including [[2]] as its order is less than the order of [[6]]
+    let (num_of_packets_before_divider_1, num_of_packets_before_divider_2) = packets.iter().fold(
+        (0, 0),
+        |(mut num_of_packets_before_divider_1, mut num_of_packets_before_divider_2), packet| {
+            if is_right_order(packet, &divider_packet_1) {
+                num_of_packets_before_divider_1 += 1;
+                num_of_packets_before_divider_2 += 1; //the order of [[2]] is less than the order of [[6]]
+            } else if is_right_order(packet, &divider_packet_2) {
+                num_of_packets_before_divider_2 += 1;
+            }
+
+            (
+                num_of_packets_before_divider_1,
+                num_of_packets_before_divider_2,
+            )
+        },
+    );
+
+    (num_of_packets_before_divider_1 + 1) * (num_of_packets_before_divider_2 + 2)
+    //the order of [[2]] is less than the order of [[6]]
 }
 
 #[cfg(test)]
