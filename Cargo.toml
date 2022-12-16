@@ -9,3 +9,4 @@ authors = ["Dima Lazarev <dmitry.lazarev@gmail.com>"]
 [dependencies]
 aoc-runner = "0.3.0"
 aoc-runner-derive = "0.3.0"
+aoc-parse = "0.2.11"
