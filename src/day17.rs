@@ -318,9 +318,10 @@ fn part2(directions: &[Direction]) -> usize {
                 position = new_position;
             } else {
                 update_chamber(shape, &position, &mut chamber);
-                truncate_chamber(&mut chamber);
 
                 if !cycle_found {
+                    truncate_chamber(&mut chamber);
+
                     let state = State {
                         tiles: chamber.tiles.clone(),
                         direction_index,
