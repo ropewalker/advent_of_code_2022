@@ -1,7 +1,7 @@
 use crate::day17::Direction::*;
 use crate::day17::TileType::*;
 use aoc_runner_derive::{aoc, aoc_generator};
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 
 const SMALLER_NUMBER_OF_ROCKS: usize = 2_022;
@@ -194,53 +194,53 @@ fn update_chamber(shape: &Shape, position: &(usize, usize), chamber: &mut Chambe
 }
 
 fn truncate_chamber(chamber: &mut Chamber) {
-    let mut lowest_accessible_height = chamber.tiles.len();
+    for y in (0..chamber.tiles.len()).rev() {
+        let mut accessible_tiles = [Rock; CHAMBER_WIDTH];
 
-    let mut queue: VecDeque<(usize, usize)> = (0..CHAMBER_WIDTH)
-        .into_iter()
-        .map(|x| (x, chamber.tiles.len()))
-        .collect();
-    let mut visited: HashSet<(usize, usize)> = queue.iter().copied().collect();
+        if y == chamber.tiles.len() - 1 {
+            accessible_tiles = chamber.tiles[y];
+        } else {
+            let previous_row = chamber.tiles[y + 1];
+            let current_row = chamber.tiles[y];
 
-    while !queue.is_empty() {
-        let (x, y) = queue.pop_front().unwrap();
+            for x in 0..CHAMBER_WIDTH {
+                if previous_row[x] == Empty && current_row[x] == Empty {
+                    accessible_tiles[x] = Empty;
 
-        for (new_x, new_y) in [(-1, 0), (1, 0), (0, -1)]
-            .into_iter()
-            .filter(|(delta_x, delta_y)| {
-                (x as isize + delta_x) >= 0
-                    && (x as isize + delta_x) < CHAMBER_WIDTH as isize
-                    && (y as isize + delta_y) >= 0
-            })
-            .map(|(delta_x, delta_y)| {
-                (
-                    (x as isize + delta_x) as usize,
-                    (y as isize + delta_y) as usize,
-                )
-            })
-        {
-            if !visited.contains(&(new_x, new_y)) {
-                visited.insert((new_x, new_y));
+                    for neighbour_x in (0..x).rev() {
+                        if accessible_tiles[neighbour_x] == Empty {
+                            break;
+                        }
 
-                if let Some(row) = chamber.tiles.get(new_y) {
-                    if row[new_x] == Empty {
-                        lowest_accessible_height = usize::min(lowest_accessible_height, new_y);
-                        queue.push_back((new_x, new_y));
+                        if current_row[neighbour_x] == Empty {
+                            accessible_tiles[neighbour_x] = Empty;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    for neighbour_x in x + 1..CHAMBER_WIDTH {
+                        if accessible_tiles[neighbour_x] == Empty {
+                            break;
+                        }
+
+                        if current_row[neighbour_x] == Empty {
+                            accessible_tiles[neighbour_x] = Empty;
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
         }
-    }
 
-    for y in lowest_accessible_height..chamber.tiles.len() {
-        for x in 0..CHAMBER_WIDTH {
-            if !visited.contains(&(x, y)) {
-                chamber.tiles[y][x] = Rock;
-            }
+        chamber.tiles[y] = accessible_tiles;
+
+        if !accessible_tiles.contains(&Empty) {
+            chamber.tiles.drain(0..=y);
+            break;
         }
     }
-
-    chamber.tiles.drain(0..lowest_accessible_height);
 }
 
 #[aoc(day17, part1)]
