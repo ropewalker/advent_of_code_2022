@@ -1,5 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque};
 
 type Coordinates = (i32, i32, i32);
 
@@ -10,26 +10,27 @@ fn parse_input(input: &str) -> Vec<Coordinates> {
     parser!(lines((i32 "," i32 "," i32))).parse(input).unwrap()
 }
 
-fn manhattan_distance(start: &Coordinates, end: &Coordinates) -> i32 {
-    (start.0 - end.0).abs() + (start.1 - end.1).abs() + (start.2 - end.2).abs()
-}
-
 #[aoc(day18, part1)]
 fn part1(cubes: &[Coordinates]) -> usize {
-    let mut covered_sides: HashMap<Coordinates, usize> = HashMap::new();
+    let cubes: HashSet<Coordinates> = cubes.iter().copied().collect();
 
-    for first_cube in cubes {
-        for second_cube in cubes {
-            if first_cube != second_cube && manhattan_distance(first_cube, second_cube) == 1 {
-                covered_sides
-                    .entry(*first_cube)
-                    .and_modify(|count| *count += 1)
-                    .or_insert(1);
-            }
-        }
-    }
-
-    cubes.len() * 6 - covered_sides.values().sum::<usize>()
+    cubes
+        .iter()
+        .map(|cube| {
+            6 - [
+                (-1, 0, 0),
+                (1, 0, 0),
+                (0, -1, 0),
+                (0, 1, 0),
+                (0, 0, -1),
+                (0, 0, 1),
+            ]
+            .into_iter()
+            .map(|(x, y, z)| (x + cube.0, y + cube.1, z + cube.2))
+            .filter(|(x, y, z)| cubes.contains(&(*x, *y, *z)))
+            .count()
+        })
+        .sum()
 }
 
 #[aoc(day18, part2)]
