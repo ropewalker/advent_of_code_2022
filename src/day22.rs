@@ -187,31 +187,6 @@ fn part1((map, path): &(HashMap<Coordinates, Tile>, Path)) -> usize {
     password(&current_position, &direction)
 }
 
-fn final_password_special_case(position: &Coordinates) -> usize {
-    let facing = match position {
-        (x, y) if *x > SIDE_SIZE && *x <= 2 * SIDE_SIZE && *y >= 1 && *y <= SIDE_SIZE => 1,
-        (x, y) if *x > 2 * SIDE_SIZE && *x <= 3 * SIDE_SIZE && *y >= 1 && *y <= SIDE_SIZE => 2,
-        (x, y)
-            if *x > SIDE_SIZE && *x <= 2 * SIDE_SIZE && *y > SIDE_SIZE && *y <= 2 * SIDE_SIZE =>
-        {
-            3
-        }
-        (x, y) if *x >= 1 && *x <= SIDE_SIZE && *y > 2 * SIDE_SIZE && *y <= 3 * SIDE_SIZE => 4,
-        (x, y)
-            if *x > SIDE_SIZE
-                && *x <= 2 * SIDE_SIZE
-                && *y > 2 * SIDE_SIZE
-                && *y <= 3 * SIDE_SIZE =>
-        {
-            5
-        }
-        (x, y) if *x >= 1 && *x <= SIDE_SIZE && *y > 3 * SIDE_SIZE && *y <= 4 * SIDE_SIZE => 6,
-        _ => unreachable!(),
-    };
-
-    1_000 * position.1 as usize + 4 * position.0 as usize + facing
-}
-
 #[aoc(day22, part2)]
 fn part2_special_case((map, path): &(HashMap<Coordinates, Tile>, Path)) -> usize {
     let mut connections: HashMap<(Coordinates, Direction), (Coordinates, Direction)> =
