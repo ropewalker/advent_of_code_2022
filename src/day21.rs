@@ -71,7 +71,7 @@ fn solve_first_riddle(monkey_name: &String, monkey_jobs: &HashMap<String, Yell>)
 
 #[aoc(day21, part1)]
 fn part1(monkey_jobs: &HashMap<String, Yell>) -> i64 {
-    solve_first_riddle(&ROOT_MONKEY_NAME.to_string(), &monkey_jobs)
+    solve_first_riddle(&ROOT_MONKEY_NAME.to_string(), monkey_jobs)
 }
 
 fn solve_second_riddle(monkey_jobs: &HashMap<String, Yell>) -> i64 {
